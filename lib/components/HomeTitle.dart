@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ashefa/screens/login.dart';
+import 'package:ashefa/screens/select_location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 import 'package:ashefa/store.dart';
@@ -34,10 +34,8 @@ class HomeTitle extends StatelessWidget {
               IconButton(
                 icon: Icon(Icons.arrow_back),
                 onPressed: () async {
-                  SharedPreferences prefs =
-                      await SharedPreferences.getInstance();
-                  await prefs.remove('userId');
-                  Navigator.pushReplacementNamed(context, LoginScreen.id);
+                  Navigator.pushReplacementNamed(
+                      context, SelectLocationScreen.id);
                 },
               )
             ],

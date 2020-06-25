@@ -7,6 +7,7 @@ import 'dart:async';
 import 'package:ashefa/models/user.dart';
 import 'package:ashefa/components/chip_field.dart';
 import 'package:ashefa/store.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:ashefa/models/session.dart';
@@ -14,6 +15,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:http/http.dart' as http;
 import 'package:ashefa/screens/home.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class EditSessionScreen extends StatefulWidget {
   static const String id = 'edit_session_screen';
@@ -24,7 +26,8 @@ class EditSessionScreen extends StatefulWidget {
 
 class _EditSessionScreenState extends State<EditSessionScreen> {
   bool loading = false;
-  String baseUrl = 'http://192.168.0.149:3000';
+  String baseUrl = 'https://ashefa-server.fildabert.com';
+//  String baseUrl = 'http://192.168.0.149:3000';
   File _image;
   final picker = ImagePicker();
 
@@ -197,7 +200,7 @@ class _EditSessionScreenState extends State<EditSessionScreen> {
                 icon: Icon(Icons.done),
                 onPressed: () async {
                   int validateCount = 0;
-
+                  // SAVE <<<<<
                   setState(() {
                     sessionNameController.text.isNotEmpty
                         ? validator['name'] = true
@@ -239,18 +242,37 @@ class _EditSessionScreenState extends State<EditSessionScreen> {
                 children: <Widget>[
                   CarouselSlider(
                     options: CarouselOptions(),
+                    // ignore: missing_return
                     items: imgList.map((item) {
                       if (item is File) {
-                        return Container(
-                          child: Center(
-                              child: Image.file(item,
-                                  fit: BoxFit.cover, width: 1000)),
+                        return GestureDetector(
+                          onTap: () {
+                            photoView(context, item);
+                          },
+                          child: Container(
+                            child: Center(
+                                child: Image.file(item,
+                                    fit: BoxFit.cover, width: 1000)),
+                          ),
                         );
                       } else if (item is String) {
-                        return Container(
-                          child: Center(
-                              child: Image.network(item,
-                                  fit: BoxFit.cover, width: 1000)),
+                        return GestureDetector(
+                          onTap: () {
+                            photoView(context, item);
+                          },
+                          child: Container(
+                            child: Center(
+                              child: CachedNetworkImage(
+                                imageUrl: item,
+                                placeholder: (context, url) =>
+                                    CircularProgressIndicator(),
+                                errorWidget: (context, url, error) =>
+                                    Icon(Icons.error),
+                                fit: BoxFit.cover,
+                                width: 1000,
+                              ),
+                            ),
+                          ),
                         );
                       }
                     }).toList(),
@@ -387,6 +409,79 @@ class _EditSessionScreenState extends State<EditSessionScreen> {
           ),
         );
       },
+    );
+  }
+
+  void photoView(BuildContext context, dynamic item) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) {
+          return Scaffold(
+            extendBodyBehindAppBar: true,
+            appBar: AppBar(
+              actions: <Widget>[
+                IconButton(
+                  icon: Icon(
+                    Icons.delete,
+                    color: Colors.white,
+                  ),
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        // return object of type Dialog
+                        return AlertDialog(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8)),
+                          title: new Text("Confirm Delete"),
+                          content: new Text(
+                              "Are you sure you want to delete this Photo?"),
+                          actions: <Widget>[
+                            // usually buttons at the bottom of the dialog
+                            FlatButton(
+                              child: new Text("Yep"),
+                              onPressed: () {
+                                setState(() {
+                                  imgList.remove(item);
+                                });
+
+                                if (item is String) {
+                                  Provider.of<Store>(context, listen: false)
+                                      .selectedSession
+                                      .pictures
+                                      .remove(item);
+                                }
+                                Navigator.popUntil(
+                                  context,
+                                  ModalRoute.withName(EditSessionScreen.id),
+                                );
+                              },
+                            ),
+                            FlatButton(
+                              child: new Text("Nah"),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                ),
+              ],
+              backgroundColor: Colors.transparent,
+            ),
+            body: Container(
+              child: PhotoView(
+                imageProvider:
+                    item is String ? NetworkImage(item) : FileImage(item),
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }

@@ -9,7 +9,8 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 
 class Store extends ChangeNotifier {
-  String baseUrl = 'http://192.168.0.149:3000';
+  String baseUrl = 'https://ashefa-server.fildabert.com';
+//  String baseUrl = 'http://192.168.0.149:3000';
   String test = 'testing123';
   String location = 'Margasatwa';
   List<User> counselorList;
@@ -26,8 +27,8 @@ class Store extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> getRecentActivities() async {
-    var response = await http.get('$baseUrl/sessions/recent');
+  Future<void> getRecentActivities(String location) async {
+    var response = await http.get('$baseUrl/sessions/recent/$location');
     if (response.statusCode == 200) {
       var body = jsonDecode(response.body);
       recentActivities = Session.parseList(body);
@@ -94,17 +95,19 @@ class Store extends ChangeNotifier {
 
       formData.files.addAll(selectedSession.imagesToUpload.map(
           (file) => MapEntry('files', MultipartFile.fromFileSync(file.path))));
+      print('before RESPONSE');
 
       var response = await dio.put(
           '$baseUrl/sessions/edit/${selectedSession.id}',
           data: formData,
           options: Options(headers: headers));
+      print(response.statusCode);
       print(response.data);
     }
 
     sessionAction = '';
     selectedDate = null;
-    await getRecentActivities();
+    await getRecentActivities(location);
     notifyListeners();
   }
 }

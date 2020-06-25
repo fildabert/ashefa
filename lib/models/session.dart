@@ -14,6 +14,8 @@ class Session {
   List<File> imagesToUpload = [];
   String location;
   DateTime createdAt;
+  DateTime updatedAt;
+  int version;
 
   static List<Session> parseList(List<dynamic> rawSessions) {
     List<Session> result = [];
@@ -33,6 +35,8 @@ class Session {
         createdAt: DateTime.parse(
           session['createdAt'],
         ),
+        updatedAt: DateTime.parse(session['updatedAt']),
+        version: session['__v'],
       ));
     });
     return result;
@@ -50,5 +54,7 @@ class Session {
       this.pictures,
       this.createdAt,
       this.imagesToUpload,
-      this.location});
+      this.location,
+      this.updatedAt,
+      this.version});
 }

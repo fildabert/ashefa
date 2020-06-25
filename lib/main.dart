@@ -7,6 +7,7 @@ import 'screens/schedule.dart';
 import 'screens/edit_session.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'screens/select_location.dart';
 import 'store.dart';
 
 void main() {
@@ -23,6 +24,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         routes: {
           LoginScreen.id: (context) => LoginScreen(),
+          SelectLocationScreen.id: (context) => SelectLocationScreen(),
           HomeScreen.id: (context) => HomeScreen(),
           AddSessionScreen.id: (context) => AddSessionScreen(),
           ProfileScreen.id: (context) => ProfileScreen(),

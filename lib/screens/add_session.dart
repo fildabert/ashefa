@@ -17,16 +17,23 @@ class _AddSessionScreenState extends State<AddSessionScreen> {
   int _selectedBottomNavigation = 0;
   bool expandedKah = false;
   List expandedList = [
-    'Session1',
-    'Session2',
-    'Session3',
-    'Session4',
-    'Session5'
+    'Addiction',
+    'Trigger Factors',
+    'Sexually Transmitted Diseases',
+    'Social Pressure',
+    '12 Steps of Recovery',
+    'Stress Management',
+    'Anger Management',
+    'Relapse Prevention',
   ];
 
   List<String> sessionNames = [
+    'Group Activity',
+    'Morning Briefing',
+    'Edutainment',
     'Cleaning Activity',
     'Sports Activity',
+    'Wrap Up',
     'Others'
   ];
 

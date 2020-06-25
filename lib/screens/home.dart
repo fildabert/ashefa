@@ -7,8 +7,9 @@ import 'package:ashefa/screens/schedule.dart';
 import 'package:ashefa/screens/profile.dart';
 import 'package:provider/provider.dart';
 import 'package:ashefa/models/session.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:ashefa/models/user.dart';
 
 class HomeScreen extends StatefulWidget {
   static const String id = 'home_screen';
@@ -23,10 +24,25 @@ class _HomeScreenState extends State<HomeScreen> {
   CalendarController _calendarController;
   @override
   void initState() {
+    getCurrentLocationAndUser();
     super.initState();
-    Provider.of<Store>(context, listen: false).getRecentActivities();
+    Store storeData = Provider.of<Store>(context, listen: false);
+    storeData.getRecentActivities(storeData.location);
 
     _calendarController = CalendarController();
+  }
+
+  void getCurrentLocationAndUser() async {
+    Store storeData = Provider.of<Store>(context, listen: false);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String userId = prefs.get('userId');
+    storeData.location = prefs.getString('location');
+    Dio dio = Dio();
+
+    var response = await dio.get('${storeData.baseUrl}/users/$userId');
+    if (response.statusCode == 200) {
+      storeData.loggedInUser = User.parseObject(response.data);
+    }
   }
 
   List<Widget> getRecentActivities() {
@@ -45,16 +61,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void dispose() {
     _calendarController.dispose();
     super.dispose();
-  }
-
-  Future<void> fetchSessions(Store storeData, DateTime date) async {
-    var response = await http.get(
-        '${storeData.baseUrl}/sessions/getbydate/${date.toIso8601String()}');
-    if (response.statusCode == 200) {
-      List<dynamic> result = jsonDecode(response.body);
-
-      storeData.sessionList = Session.parseList(result);
-    }
   }
 
   @override

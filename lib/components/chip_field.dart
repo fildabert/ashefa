@@ -69,7 +69,7 @@ class _ChipFieldState extends State<ChipField> {
           materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         );
       },
-      suggestionBuilder: (context, state, profile) {
+      suggestionBuilder: (context, ChipsInputState state, profile) {
         return ListTile(
           key: ObjectKey(profile),
           leading: CustomAvatar(

@@ -6,9 +6,12 @@ import 'dart:convert';
 import 'package:ashefa/store.dart';
 import 'package:ashefa/models/user.dart';
 import 'package:ashefa/screens/home.dart';
+import 'package:ashefa/screens/select_location.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
 
 class LoginScreen extends StatefulWidget {
   static const String id = 'login_screen';
+
   LoginScreen({Key key, this.title}) : super(key: key);
 
   Map<String, String> userField = {
@@ -22,6 +25,8 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  bool validate = true;
+
   void login() async {
     String baseUrl = Provider.of<Store>(context, listen: false).baseUrl;
     Map<String, String> headers = {"content-type": "application/json"};
@@ -31,7 +36,6 @@ class _LoginScreenState extends State<LoginScreen> {
     };
 
     var body = jsonEncode(data);
-
     var response =
         await http.post('$baseUrl/users/login', headers: headers, body: body);
 
@@ -41,8 +45,12 @@ class _LoginScreenState extends State<LoginScreen> {
           User.parseObject(result);
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setString('userId', result['_id']);
-      Navigator.pushReplacementNamed(context, HomeScreen.id);
+      Navigator.pushReplacementNamed(context, SelectLocationScreen.id);
     } else if (response.statusCode == 400) {
+      setState(() {
+        validate = false;
+      });
+
       print(response.body);
     }
   }
@@ -66,6 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
               },
               obscureText: isPassword,
               decoration: InputDecoration(
+                  errorText: validate ? null : 'Invalid Username/Password',
                   border: InputBorder.none,
                   fillColor: Color(0xfff3f3f4),
                   filled: true))
@@ -188,35 +197,36 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     return Scaffold(
-        body: Container(
-      height: height,
-      child: Stack(
-        children: <Widget>[
-          Positioned(
-              top: -height * .15,
-              right: -MediaQuery.of(context).size.width * .4,
-              child: Container()),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  SizedBox(height: height * .2),
-                  _title(),
-                  SizedBox(height: 50),
-                  _emailPasswordWidget(),
-                  SizedBox(height: 20),
-                  _submitButton(),
+      body: Container(
+        height: height,
+        child: Stack(
+          children: <Widget>[
+            Positioned(
+                top: -height * .15,
+                right: -MediaQuery.of(context).size.width * .4,
+                child: Container()),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    SizedBox(height: height * .2),
+                    _title(),
+                    SizedBox(height: 50),
+                    _emailPasswordWidget(),
+                    SizedBox(height: 20),
+                    _submitButton(),
 //                  _divider(),
-                  SizedBox(height: height * .055),
-                ],
+                    SizedBox(height: height * .055),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ));
+    );
   }
 }

@@ -31,10 +31,11 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   }
 
   Future<void> fetchSessions(Store storeData) async {
+    storeData.sessionList = [];
     setLoading(true);
     await Future.delayed(Duration(seconds: 1));
     var response = await http.get(
-        '${storeData.baseUrl}/sessions/getbydate/${widget.date.toIso8601String()}');
+        '${storeData.baseUrl}/sessions/getbydate/${widget.date.toIso8601String()}/${storeData.location}');
     if (response.statusCode == 200) {
       List<dynamic> result = jsonDecode(response.body);
       storeData.sessionList = Session.parseList(result);
