@@ -27,6 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
     getCurrentLocationAndUser();
     super.initState();
     Store storeData = Provider.of<Store>(context, listen: false);
+    print(storeData.location);
     storeData.getRecentActivities(storeData.location);
 
     _calendarController = CalendarController();

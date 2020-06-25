@@ -16,6 +16,7 @@ import 'package:http/http.dart' as http;
 import 'package:ashefa/screens/home.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dio/dio.dart';
 
 class EditSessionScreen extends StatefulWidget {
   static const String id = 'edit_session_screen';
@@ -147,92 +148,107 @@ class _EditSessionScreenState extends State<EditSessionScreen> {
             title: Text(
               storeData.selectedDate != null
                   ? DateFormat.yMMMMd().format(storeData.selectedDate)
-                  : 'Session',
+                  : DateFormat.yMMMMd().format(storeData.selectedSession.time),
               style: TextStyle(color: Colors.black),
             ),
             actions: <Widget>[
               IconButton(
                 icon: Icon(Icons.delete),
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      // return object of type Dialog
-                      return AlertDialog(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8)),
-                        title: new Text("Confirm Delete"),
-                        content: new Text(
-                            "Are you sure you want to delete this session?"),
-                        actions: <Widget>[
-                          // usually buttons at the bottom of the dialog
-                          FlatButton(
-                            child: new Text("Yep"),
-                            onPressed: () async {
-                              setLoading(true);
-                              await Provider.of<Store>(context, listen: false)
-                                  .deleteSelectedSession();
-                              setLoading(false);
-                              Navigator.popUntil(
-                                  context, ModalRoute.withName(HomeScreen.id));
-                            },
-                          ),
-                          FlatButton(
-                            child: new Text("Nah"),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                },
+                onPressed: storeData.sessionAction == 'VIEW'
+                    ? null
+                    : () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            // return object of type Dialog
+                            return AlertDialog(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8)),
+                              title: new Text("Confirm Delete"),
+                              content: new Text(
+                                  "Are you sure you want to delete this session?"),
+                              actions: <Widget>[
+                                // usually buttons at the bottom of the dialog
+                                FlatButton(
+                                  child: new Text("Yep"),
+                                  onPressed: () async {
+                                    setLoading(true);
+                                    await Provider.of<Store>(context,
+                                            listen: false)
+                                        .deleteSelectedSession();
+                                    setLoading(false);
+                                    Navigator.popUntil(context,
+                                        ModalRoute.withName(HomeScreen.id));
+                                  },
+                                ),
+                                FlatButton(
+                                  child: new Text("Nah"),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
               ),
               IconButton(
                 icon: Icon(Icons.file_upload),
-                onPressed: () {
-                  getImage();
-                  // TODO: upload photo
-                },
+                onPressed: storeData.sessionAction == 'VIEW'
+                    ? null
+                    : () {
+                        getImage();
+                        // TODO: upload photo
+                      },
               ),
-              IconButton(
-                icon: Icon(Icons.done),
-                onPressed: () async {
-                  int validateCount = 0;
-                  // SAVE <<<<<
-                  setState(() {
-                    sessionNameController.text.isNotEmpty
-                        ? validator['name'] = true
-                        : validator['name'] = false;
-                    sessionTimeController.text.isNotEmpty
-                        ? validator['time'] = true
-                        : validator['time'] = false;
-                    storeData.selectedSession.counselors.length > 0
-                        ? validator['counselors'] = true
-                        : validator['counselors'] = false;
-                    storeData.selectedSession.clients.length > 0
-                        ? validator['clients'] = true
-                        : validator['clients'] = false;
-                    validator.forEach((key, value) {
-                      if (value) {
-                        validateCount += 1;
-                      }
+              Builder(builder: (BuildContext context) {
+                return IconButton(
+                  icon: Icon(Icons.done),
+                  onPressed: () async {
+                    int validateCount = 0;
+                    // SAVE <<<<<
+                    setState(() {
+                      sessionNameController.text.isNotEmpty
+                          ? validator['name'] = true
+                          : validator['name'] = false;
+                      sessionTimeController.text.isNotEmpty
+                          ? validator['time'] = true
+                          : validator['time'] = false;
+                      storeData.selectedSession.counselors.length > 0
+                          ? validator['counselors'] = true
+                          : validator['counselors'] = false;
+                      storeData.selectedSession.clients.length > 0
+                          ? validator['clients'] = true
+                          : validator['clients'] = false;
+                      validator.forEach((key, value) {
+                        if (value) {
+                          validateCount += 1;
+                        }
+                      });
                     });
-                  });
-                  if (validateCount == validator.length) {
-                    setLoading(true);
-                    storeData.selectedSession.imagesToUpload =
-                        List<File>.from(imgList.where((file) => file is File));
+                    if (validateCount == validator.length) {
+                      setLoading(true);
+                      storeData.selectedSession.imagesToUpload =
+                          List<File>.from(
+                              imgList.where((file) => file is File));
 
-                    await storeData.saveSelectedSession();
-                    setLoading(false);
-                    Navigator.popUntil(
-                        context, ModalRoute.withName(HomeScreen.id));
-                  }
-                  print(validator);
-                },
-              ),
+                      try {
+                        await storeData.saveSelectedSession();
+                        setLoading(false);
+                        Navigator.popUntil(
+                            context, ModalRoute.withName(HomeScreen.id));
+                      } on DioError catch (error) {
+                        Scaffold.of(context).showSnackBar(SnackBar(
+                          backgroundColor: Colors.red,
+                          content: Text(error.response.toString()),
+                        ));
+                      }
+                      setLoading(false);
+                    }
+                  },
+                );
+              }),
             ],
           ),
           body: ModalProgressHUD(
@@ -278,12 +294,15 @@ class _EditSessionScreenState extends State<EditSessionScreen> {
                     }).toList(),
                   ),
                   Padding(
+                    // INPUT FIELDS <<<<<<
                     padding: const EdgeInsets.all(10.0),
                     child: Column(
                       children: <Widget>[
                         TextField(
                           textCapitalization: TextCapitalization.words,
                           controller: sessionNameController,
+                          enabled:
+                              storeData.sessionAction == 'VIEW' ? false : true,
                           onChanged: (input) {
                             storeData.selectedSession.name = input;
                           },
@@ -307,6 +326,9 @@ class _EditSessionScreenState extends State<EditSessionScreen> {
                                 storeData.selectedSession.counselors != null
                                     ? storeData.selectedSession.counselors
                                     : [],
+                            enabled: storeData.sessionAction == 'VIEW'
+                                ? false
+                                : true,
                             onChanged: (List<User> counselors) {
                               storeData.selectedSession.counselors = counselors;
                             },
@@ -326,6 +348,9 @@ class _EditSessionScreenState extends State<EditSessionScreen> {
                                 storeData.selectedSession.clients != null
                                     ? storeData.selectedSession.clients
                                     : [],
+                            enabled: storeData.sessionAction == 'VIEW'
+                                ? false
+                                : true,
                             onChanged: (List<User> clients) {
                               storeData.selectedSession.clients = clients;
                             },
@@ -345,6 +370,8 @@ class _EditSessionScreenState extends State<EditSessionScreen> {
                         DateTimeField(
                           controller: sessionTimeController,
                           format: format,
+                          enabled:
+                              storeData.sessionAction == 'VIEW' ? false : true,
                           decoration: InputDecoration(
                               labelText: 'Time',
                               errorText: validator['time']
@@ -369,6 +396,8 @@ class _EditSessionScreenState extends State<EditSessionScreen> {
                         SizedBox(height: 10),
                         TextField(
                           controller: sessionReportController,
+                          enabled:
+                              storeData.sessionAction == 'VIEW' ? false : true,
                           textCapitalization: TextCapitalization.sentences,
                           onChanged: (input) {
                             Session selectedSession = storeData.selectedSession;
@@ -386,11 +415,13 @@ class _EditSessionScreenState extends State<EditSessionScreen> {
                               ? Text('Completed')
                               : Text('Ongoing'),
                           value: storeData.selectedSession.completed,
-                          onChanged: (bool value) {
-                            setState(() {
-                              storeData.selectedSession.completed = value;
-                            });
-                          },
+                          onChanged: storeData.sessionAction == 'VIEW'
+                              ? null
+                              : (bool value) {
+                                  setState(() {
+                                    storeData.selectedSession.completed = value;
+                                  });
+                                },
                           secondary: Icon(
                             storeData.selectedSession.completed
                                 ? Icons.check_circle

@@ -10,6 +10,7 @@ class ChipField extends StatefulWidget {
   Function onChanged;
   List<User> initialValue;
   String errorText;
+  bool enabled;
 
   ChipField(
       {this.userList,
@@ -17,7 +18,8 @@ class ChipField extends StatefulWidget {
       this.labelText,
       this.onChanged,
       this.initialValue,
-      this.errorText});
+      this.errorText,
+      this.enabled});
   @override
   _ChipFieldState createState() => _ChipFieldState();
 }
@@ -30,6 +32,7 @@ class _ChipFieldState extends State<ChipField> {
     return ChipsInput(
       key: _chipKey,
       initialValue: widget.initialValue,
+      enabled: widget.enabled,
       decoration: InputDecoration(
           labelText: widget.labelText,
           border: OutlineInputBorder(),

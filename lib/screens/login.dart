@@ -181,6 +181,8 @@ class _LoginScreenState extends State<LoginScreen> {
   void checkLogin() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String loggedIn = prefs.getString('userId');
+    Provider.of<Store>(context, listen: false).location =
+        prefs.getString('location');
     if (loggedIn != null) {
       Navigator.pushReplacementNamed(context, HomeScreen.id);
     }

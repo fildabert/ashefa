@@ -12,7 +12,7 @@ class Store extends ChangeNotifier {
   String baseUrl = 'https://ashefa-server.fildabert.com';
 //  String baseUrl = 'http://192.168.0.149:3000';
   String test = 'testing123';
-  String location = 'Margasatwa';
+  String location;
   List<User> counselorList;
   List<User> clientList;
   DateTime selectedDate;
@@ -32,6 +32,7 @@ class Store extends ChangeNotifier {
     if (response.statusCode == 200) {
       var body = jsonDecode(response.body);
       recentActivities = Session.parseList(body);
+
       notifyListeners();
     }
   }
@@ -72,6 +73,7 @@ class Store extends ChangeNotifier {
           selectedSession.pictures != null ? selectedSession.pictures : [],
     };
 
+    print(data);
     var body = jsonEncode(data);
     Map<String, String> headers = {"content-type": "multipart/form-data"};
 
@@ -95,14 +97,11 @@ class Store extends ChangeNotifier {
 
       formData.files.addAll(selectedSession.imagesToUpload.map(
           (file) => MapEntry('files', MultipartFile.fromFileSync(file.path))));
-      print('before RESPONSE');
 
       var response = await dio.put(
           '$baseUrl/sessions/edit/${selectedSession.id}',
           data: formData,
           options: Options(headers: headers));
-      print(response.statusCode);
-      print(response.data);
     }
 
     sessionAction = '';

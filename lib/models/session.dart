@@ -32,6 +32,7 @@ class Session {
             List<String>.from(session['pictures'].where((i) => i is String)),
         counselors: User.parseList(session['counselors']),
         clients: User.parseList(session['clients']),
+        location: session['location'],
         createdAt: DateTime.parse(
           session['createdAt'],
         ),
