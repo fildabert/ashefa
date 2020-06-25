@@ -146,9 +146,9 @@ class _EditSessionScreenState extends State<EditSessionScreen> {
             backgroundColor: Colors.white,
             iconTheme: IconThemeData(color: Colors.black),
             title: Text(
-              storeData.selectedDate != null
-                  ? DateFormat.yMMMMd().format(storeData.selectedDate)
-                  : DateFormat.yMMMMd().format(storeData.selectedSession.time),
+              storeData.selectedSession.time != null
+                  ? DateFormat.yMMMMd().format(storeData.selectedSession.time)
+                  : DateFormat.yMMMMd().format(storeData.selectedDate),
               style: TextStyle(color: Colors.black),
             ),
             actions: <Widget>[

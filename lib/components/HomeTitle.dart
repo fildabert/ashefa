@@ -20,7 +20,8 @@ class HomeTitle extends StatelessWidget {
             children: <Widget>[
               CircleAvatar(
                 radius: 30,
-                backgroundImage: AssetImage('images/margasatwa.jpg'),
+                backgroundImage: AssetImage(
+                    'images/${Provider.of<Store>(context, listen: false).location.toLowerCase()}.jpg'),
               ),
               SizedBox(
                 width: 10,

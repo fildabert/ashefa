@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
           ScheduleScreen.id: (context) => ScheduleScreen(),
           EditSessionScreen.id: (context) => EditSessionScreen()
         },
-        initialRoute: loggedIn ? HomeScreen.id : LoginScreen.id,
+        initialRoute: SelectLocationScreen.id,
       ),
     );
   }

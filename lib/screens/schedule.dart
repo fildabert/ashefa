@@ -10,6 +10,7 @@ import 'package:ashefa/models/session.dart';
 import 'package:ashefa/models/user.dart';
 import 'package:http/http.dart' as http;
 import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class ScheduleScreen extends StatefulWidget {
   static const String id = 'schedule_screen';
@@ -137,6 +138,10 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
       builder: (BuildContext context, Store storeData, child) {
         return Container(
           child: ModalProgressHUD(
+            progressIndicator: SpinKitRipple(
+              color: Colors.blueGrey,
+              size: 80,
+            ),
             inAsyncCall: loading,
             child: ListView(
               children: <Widget>[
