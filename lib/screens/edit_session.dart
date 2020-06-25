@@ -17,6 +17,7 @@ import 'package:ashefa/screens/home.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class EditSessionScreen extends StatefulWidget {
   static const String id = 'edit_session_screen';
@@ -252,6 +253,10 @@ class _EditSessionScreenState extends State<EditSessionScreen> {
             ],
           ),
           body: ModalProgressHUD(
+            progressIndicator: SpinKitRipple(
+              color: Colors.blueGrey,
+              size: 100,
+            ),
             inAsyncCall: loading,
             child: SafeArea(
               child: ListView(
