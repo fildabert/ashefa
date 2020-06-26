@@ -104,7 +104,7 @@ class _LoginScreenState extends State<LoginScreen> {
             gradient: LinearGradient(
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight,
-                colors: [Color(0xfffbb448), Color(0xfff7892b)])),
+                colors: [Color(0xFF4CB8C4), Color(0xFF3CD3AD)])),
         child: Text(
           'Login',
           style: TextStyle(fontSize: 20, color: Colors.white),
@@ -163,7 +163,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             TextSpan(
               text: 'efa',
-              style: TextStyle(color: Color(0xffe46b10), fontSize: 30),
+              style: TextStyle(color: Color(0xFF3CD3AD), fontSize: 30),
             ),
           ]),
     );
@@ -214,7 +214,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    SizedBox(height: height * .2),
+                    SizedBox(height: height * .15),
+                    Image.asset('images/ashefa-logo.png'),
+                    SizedBox(height: 10),
                     _title(),
                     SizedBox(height: 50),
                     _emailPasswordWidget(),

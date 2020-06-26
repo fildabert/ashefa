@@ -7,11 +7,10 @@ import 'package:provider/provider.dart';
 import 'package:ashefa/store.dart';
 import 'package:ashefa/screens/home.dart';
 
-class SelectLocationScreen extends StatelessWidget {
-  int locationIndex = 0;
+class SelectLocationScreen extends StatefulWidget {
   static const String id = 'select_location_screen';
 
-  static final List<String> locationList = ['Margasatwa', 'Antasari'];
+  static List<String> locationList = ['Margasatwa', 'Antasari'];
 
   static final List<List<Color>> gradientList = [
     [Color(0xFF70e1f5), Color(0xFFffd194)],
@@ -26,7 +25,14 @@ class SelectLocationScreen extends StatelessWidget {
     [Color(0xFF1F1C2C), Color(0xFF928DAB)],
   ];
 
-  final List<Widget> imageSliders = locationList
+  @override
+  _SelectLocationScreenState createState() => _SelectLocationScreenState();
+}
+
+class _SelectLocationScreenState extends State<SelectLocationScreen> {
+  int locationIndex = 0;
+
+  final List<Widget> imageSliders = SelectLocationScreen.locationList
       .map((item) => Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(6),
@@ -73,7 +79,8 @@ class SelectLocationScreen extends StatelessWidget {
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-              colors: gradientList[Random().nextInt(gradientList.length)],
+              colors: SelectLocationScreen.gradientList[
+                  Random().nextInt(SelectLocationScreen.gradientList.length)],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter),
         ),
@@ -139,10 +146,11 @@ class SelectLocationScreen extends StatelessWidget {
                 ),
                 onPressed: () async {
                   Provider.of<Store>(context, listen: false).location =
-                      locationList[locationIndex];
+                      SelectLocationScreen.locationList[locationIndex];
                   SharedPreferences prefs =
                       await SharedPreferences.getInstance();
-                  prefs.setString('location', locationList[locationIndex]);
+                  prefs.setString('location',
+                      SelectLocationScreen.locationList[locationIndex]);
                   Navigator.pushReplacementNamed(context, HomeScreen.id);
                 },
               )

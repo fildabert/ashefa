@@ -29,9 +29,11 @@ class CustomTimeline extends StatelessWidget {
                 color: isDone ? Colors.green : Colors.orange,
               ),
             ),
-            Container(
-              child: Text(time),
-              color: Colors.white,
+            Expanded(
+              child: Container(
+                child: Text(time),
+                color: Colors.white70,
+              ),
             )
           ],
         ),
